@@ -52,11 +52,6 @@ scene.add(camera);
 const renderer = new THREE.WebGPURenderer({ canvas, antialias: true });
 renderer.setSize(sizes.width, sizes.height);
 
-const init = async () => {
-  await renderer.init();
-  renderer.render(scene, camera);
-};
-
 // Timer
 const timer = new THREE.Timer();
 timer.connect(document);
@@ -73,7 +68,12 @@ const tick = (timestamp: number) => {
   camera.position.y = Math.sin(elapsed);
   camera.position.x = Math.cos(elapsed);
   camera.lookAt(group.position);
-  init();
+  renderer.render(scene, camera);
 };
 
-globalThis.window.requestAnimationFrame(tick);
+const init = async () => {
+  await renderer.init();
+  globalThis.window.requestAnimationFrame(tick);
+};
+
+init();
