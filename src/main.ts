@@ -1,5 +1,6 @@
 import "./style.css";
 import * as THREE from "three/webgpu";
+import gsap from "gsap";
 
 // Canvas
 const canvas = document.querySelector("canvas.webgl") as HTMLCanvasElement;
@@ -10,7 +11,6 @@ scene.background = new THREE.Color(0x1a1a1a);
 
 // Object
 const group = new THREE.Group();
-group.position.y = 0.5;
 scene.add(group);
 
 const cube1 = new THREE.Mesh(
@@ -62,12 +62,14 @@ const timer = new THREE.Timer();
 timer.connect(document);
 
 // Animations
+gsap.to(cube1.position, { x: 1.5, duration: 1, yoyo: true, repeat: -1 });
+gsap.to(cube2.position, { y: 1.5, duration: 1, yoyo: true, repeat: -1 });
+gsap.to(cube3.position, { x: -1.5, duration: 1, yoyo: true, repeat: -1 });
+
 const tick = (timestamp: number) => {
   globalThis.window.requestAnimationFrame(tick);
   timer.update(timestamp);
-  const delta = timer.getDelta();
   const elapsed = timer.getElapsed();
-  group.rotation.z -= delta * 0.5;
   camera.position.y = Math.sin(elapsed);
   camera.position.x = Math.cos(elapsed);
   camera.lookAt(group.position);
