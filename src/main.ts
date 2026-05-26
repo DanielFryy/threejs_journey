@@ -1,6 +1,7 @@
 import "./style.css";
 import * as THREE from "three/webgpu";
 import gsap from "gsap";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 // Canvas
 const canvas = document.querySelector("canvas.webgl") as HTMLCanvasElement;
@@ -42,11 +43,16 @@ const sizes = {
   width: window.innerWidth,
   height: window.innerHeight
 };
+const aspectRatio = sizes.width / sizes.height;
 
 // Camera
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height);
-camera.position.z = 3;
+const camera = new THREE.PerspectiveCamera(75, aspectRatio, 0.1, 100);
+camera.position.z = 5;
 scene.add(camera);
+
+// Controls
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
 
 // Renderer
 const renderer = new THREE.WebGPURenderer({ canvas, antialias: true });
@@ -57,17 +63,20 @@ const timer = new THREE.Timer();
 timer.connect(document);
 
 // Animations
-gsap.to(cube1.position, { x: 1.5, duration: 1, yoyo: true, repeat: -1 });
-gsap.to(cube2.position, { y: 1.5, duration: 1, yoyo: true, repeat: -1 });
-gsap.to(cube3.position, { x: -1.5, duration: 1, yoyo: true, repeat: -1 });
+gsap.to(cube1.rotation, { y: Math.PI * 2, duration: 5, repeat: -1 });
+gsap.to(cube2.rotation, { y: Math.PI * 2, duration: 5, repeat: -1 });
+gsap.to(cube3.rotation, { y: Math.PI * 2, duration: 5, repeat: -1 });
 
 const tick = (timestamp: number) => {
   globalThis.window.requestAnimationFrame(tick);
   timer.update(timestamp);
   const elapsed = timer.getElapsed();
-  camera.position.y = Math.sin(elapsed);
-  camera.position.x = Math.cos(elapsed);
-  camera.lookAt(group.position);
+  cube1.position.y = Math.sin(elapsed);
+  cube2.position.y = Math.sin(elapsed + Math.PI / 3);
+  cube3.position.y = Math.sin(elapsed + 2 * Math.PI / 3);
+
+  controls.update();
+
   renderer.render(scene, camera);
 };
 
